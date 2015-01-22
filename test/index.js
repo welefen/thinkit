@@ -459,7 +459,14 @@ describe('isObject', function(){
     assert.equal(isObject(new Buffer(11)), false)
   })
 })
-
+describe('isArray', function(){
+  it('isArray("") = false', function(){
+    assert.equal(isArray(""), false);
+  })
+  it('isArray([]) = true', function(){
+    assert.equal(isArray([]), true);
+  })
+})
 
 describe('isString', function(){
   it('isString("") = true', function(){
@@ -799,4 +806,30 @@ describe('chmod', function(){
   it('path not exist', function(){
     chmod(__dirname + '/fasdfasdfasdf.txt');
   });
+})
+
+describe('arrToObj', function(){
+  var data = [{
+    name: 'welefen',
+    value: 1
+  }, {
+    name: 'suredy',
+    value: 2
+  }]
+  it('arrToObj("name")', function(){
+    var res = arrToObj(data, 'name');
+    assert.equal(JSON.stringify(res), '{"welefen":{"name":"welefen","value":1},"suredy":{"name":"suredy","value":2}}')
+  })
+  it('arrToObj("name", "value")', function(){
+    var res = arrToObj(data, 'name', 'value');
+    assert.equal(JSON.stringify(res), '{"welefen":1,"suredy":2}')
+  })
+  it('arrToObj("name", null)', function(){
+    var res = arrToObj(data, 'name', null);
+    assert.equal(JSON.stringify(res), '["welefen","suredy"]')
+  })
+  it('arrToObj("value", null)', function(){
+    var res = arrToObj(data, 'value', null);
+    assert.equal(JSON.stringify(res), '[1,2]')
+  })
 })
