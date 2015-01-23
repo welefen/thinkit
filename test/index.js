@@ -808,6 +808,15 @@ describe('chmod', function(){
   });
 })
 
+describe('isBuffer', function(){
+  it('isBuffer', function(){
+    assert.equal(isBuffer(new Buffer(10)), true)
+  });
+  it('isBuffer', function(){
+    assert.equal(isBuffer(''), false)
+  });
+})
+
 describe('arrToObj', function(){
   var data = [{
     name: 'welefen',
