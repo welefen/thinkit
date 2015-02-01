@@ -842,3 +842,14 @@ describe('arrToObj', function(){
     assert.equal(JSON.stringify(res), '[1,2]')
   })
 })
+
+describe('getFiles', function(){
+  it('getFiles', function(){
+    var files = getFiles(__dirname + '/'); 
+    assert.deepEqual(files, ['index.js']);
+  })
+  it('getFiles empty', function(){
+    var files = getFiles(__dirname + '/dddd/'); 
+    assert.deepEqual(files, []);
+  })
+})
