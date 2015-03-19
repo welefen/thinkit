@@ -459,6 +459,7 @@ describe('isObject', function(){
     assert.equal(isObject(new Buffer(11)), false)
   })
 })
+
 describe('isArray', function(){
   it('isArray("") = false', function(){
     assert.equal(isArray(""), false);
@@ -851,5 +852,16 @@ describe('getFiles', function(){
   it('getFiles empty', function(){
     var files = getFiles(__dirname + '/dddd/'); 
     assert.deepEqual(files, []);
+  })
+})
+
+describe('objValues', function(){
+  it('objValues', function(){
+    var value = objValues({name: '111'}); 
+    assert.deepEqual(value, ['111']);
+  })
+  it('objValues, data empty', function(){
+    var value = objValues({}); 
+    assert.deepEqual(value, []);
   })
 })
