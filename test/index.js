@@ -256,6 +256,40 @@ describe('Class', function(){
     assert.deepEqual(f1.arr, [1]);
     assert.deepEqual(f2.arr, [2]);
   })
+
+
+  var D1 = Class({
+    init: function(){
+      return Promise.resolve(1);
+    }
+  })
+  var D2 = Class(D1, {
+    init: function(){
+      return this.super('init').then(function(data){
+        return data + 10;
+      })
+    }
+  })
+  var D3 = Class(D2, {
+    init: function(){
+      return this.super('init').then(function(data){
+        return data + 100;
+      })
+    }
+  })
+  var D4 = Class(D3, {
+    init: function(){
+      return this.super('init').then(function(data){
+        return data + 1000;
+      })
+    }
+  })
+  it('promise init', function(){
+    var instance = D4();
+    return Promise.resolve(instance.__initReturn).then(function(data){
+      assert.equal(data, 1111)
+    })
+  })
 })
 
 describe('super', function(){
