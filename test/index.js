@@ -406,6 +406,14 @@ describe('extend', function(){
   })
 })
 
+describe('isClass', function(){
+  it('isClass(true)', function(){
+    assert.equal(isClass(true), false);
+  })
+  it('isClass(Class())', function(){
+    assert.equal(isClass(Class()), true);
+  })
+})
 
 describe('isBoolean', function(){
   it('isBoolean(true) = true', function(){
