@@ -290,6 +290,32 @@ describe('Class', function(){
       assert.equal(data, 1111)
     })
   })
+
+
+  var E1 = Class({
+    data: {
+      name: 'welefen',
+      value: {
+        type: 'welefen',
+        val: 'suredy'
+      }
+    }
+  })
+  var E2 = Class(E1, {
+    data: {
+      name: 'suredy'
+    }
+  })
+
+
+
+  it('data name value', function(){
+    var i1 = E2();
+    var i2 = E2();
+    i2.data.name = 'i2';
+    assert.equal(i1.data.name, 'suredy');
+    assert.equal(i1.value, undefined);
+  })
 })
 
 describe('super', function(){
