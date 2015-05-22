@@ -1,4 +1,4 @@
-TESTS = test/
+TESTS = test/index.js
 REPORTER = spec
 TIMEOUT = 10000
 MOCHA_OPTS = --recursive
