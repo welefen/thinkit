@@ -331,7 +331,7 @@ describe('Class', function(){
   })
 })
 describe('constructor', function(){
-  it('constructor', function(){
+  it('not support constructor', function(){
     var Base = function(){
       this.name = 'welefen';
     }
@@ -341,7 +341,7 @@ describe('constructor', function(){
       }
     })
     var instance = new cls();
-    assert.equal(instance.getName(), 'welefen')
+    assert.equal(instance.getName(), undefined)
   })
 })
 describe('super', function(){
@@ -692,6 +692,21 @@ describe('isEmpty', function(){
   })
 })
 
+
+describe('clone', function(){
+  it('clone false', function(){
+    assert.equal(clone(false), false);
+  })
+  it('clone 1', function(){
+    assert.equal(clone(1), 1);
+  })
+  it('clone array', function(){
+    assert.deepEqual(clone([1,2,3]), [1,2,3]);
+  })
+  it('clone object', function(){
+    assert.deepEqual(clone({name: 'welefen'}), {name: 'welefen'})
+  })
+})
 
 describe('isFile', function(){
   it('isFile("test.a") = false', function(){
