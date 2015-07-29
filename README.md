@@ -1,2 +1,2 @@
 # thinkit
-thinkjs-kit
+thinkjs toolkit

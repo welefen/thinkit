@@ -1,33 +1,15 @@
 'use strict';
 
-exports.__esModule = true;
+import fs from 'fs';
+import path from 'path';
+import util from 'util';
+import crypto from 'crypto';
+import net from 'net';
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _fs = require('fs');
-
-var _fs2 = _interopRequireDefault(_fs);
-
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
-
-var _util = require('util');
-
-var _util2 = _interopRequireDefault(_util);
-
-var _crypto = require('crypto');
-
-var _crypto2 = _interopRequireDefault(_crypto);
-
-var _net = require('net');
-
-var _net2 = _interopRequireDefault(_net);
-
-var toString = Object.prototype.toString;
-var isArray = Array.isArray;
-var isBuffer = Buffer.isBuffer;
-var numberReg = /^((\-?\d*\.?\d*(?:e[+-]?\d*(?:\d?\.?|\.?\d?)\d*)?)|(0[0-7]+)|(0x[0-9a-f]+))$/i;
+let toString = Object.prototype.toString;
+let isArray = Array.isArray;
+let isBuffer = Buffer.isBuffer;
+let numberReg = /^((\-?\d*\.?\d*(?:e[+-]?\d*(?:\d?\.?|\.?\d?)\d*)?)|(0[0-7]+)|(0x[0-9a-f]+))$/i;
 
 if (!global.Promise) {
   global.Promise = require('es6-promise').Promise;
@@ -35,9 +17,9 @@ if (!global.Promise) {
 
 //Promise defer
 if (!Promise.defer) {
-  Promise.defer = function () {
-    var deferred = {};
-    deferred.promise = new Promise(function (resolve, reject) {
+  Promise.defer = () => {
+    let deferred = {};
+    deferred.promise = new Promise((resolve, reject) => {
       deferred.resolve = resolve;
       deferred.reject = reject;
     });
@@ -45,12 +27,13 @@ if (!Promise.defer) {
   };
 }
 
+
 /**
  * check object is function
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isFunction = function isFunction(obj) {
+let isFunction = obj => {
   return typeof obj === 'function';
 };
 
@@ -59,39 +42,38 @@ var isFunction = function isFunction(obj) {
  * @param {Function} superCtor [super constructor]
  * @param {Object} props     []
  */
-function Class(superCtor, props) {
-  var cls = function cls() {
+function Class(superCtor, props){
+  let cls = function (...args) {
     if (!(this instanceof cls)) {
       throw new Error('Class constructors cannot be invoked without \'new\'');
     }
     //extend prototype data to instance
     //avoid instance change data to pullte prototype
     cls.extend(cls.__props__, this);
-    if (isFunction(this.init)) {
-      this.__initReturn = this.init.apply(this, arguments);
+    if(isFunction(this.init)){
+      this.__initReturn = this.init(...args);
     }
   };
   cls.__props__ = {};
-  cls.extend = function (props, target) {
+  cls.extend = function(props, target){
     target = target || cls.prototype;
-    var name = undefined,
-        value = undefined;
-    for (name in props) {
+    let name, value;
+    for(name in props){
       value = props[name];
       if (isArray(value)) {
         cls.__props__[name] = target[name] = extend([], value);
-      } else if (isObject(value)) {
+      }else if(isObject(value)){
         cls.__props__[name] = target[name] = extend({}, value);
-      } else {
+      }else{
         target[name] = value;
       }
     }
     return cls;
   };
-  cls.inherits = function (superCtor) {
+  cls.inherits = function(superCtor){
     cls.super_ = superCtor;
     //if superCtor.prototype is not enumerable
-    if (Object.keys(superCtor.prototype).length === 0) {
+    if(Object.keys(superCtor.prototype).length === 0){
       cls.prototype = Object.create(superCtor.prototype, {
         constructor: {
           value: cls,
@@ -100,14 +82,14 @@ function Class(superCtor, props) {
           configurable: true
         }
       });
-    } else {
+    }else{
       extend(cls.prototype, superCtor.prototype);
     }
     return cls;
   };
   if (!isFunction(superCtor)) {
     props = superCtor;
-  } else if (isFunction(superCtor)) {
+  }else if (isFunction(superCtor)) {
     cls.inherits(superCtor);
   }
   if (props) {
@@ -119,17 +101,17 @@ function Class(superCtor, props) {
    * @param  {Mixed} data []
    * @return {Mixed}      []
    */
-  cls.prototype['super'] = function (name, data) {
+  cls.prototype.super = function(name, data){
     if (!this[name]) {
       this.super_c = null;
       return;
     }
-    var super_ = this.super_c ? this.super_c.super_ : this.constructor.super_;
+    let super_ = this.super_c ? this.super_c.super_ : this.constructor.super_;
     if (!super_ || !isFunction(super_.prototype[name])) {
       this.super_c = null;
       return;
     }
-    while (this[name] === super_.prototype[name] && super_.super_) {
+    while(this[name] === super_.prototype[name] && super_.super_){
       super_ = super_.super_;
     }
     this.super_c = super_;
@@ -139,9 +121,7 @@ function Class(superCtor, props) {
     if (!isArray(data)) {
       data = arguments.length === 1 ? [] : [data];
     }
-    var t = ++this.super_t,
-        ret = undefined,
-        method = super_.prototype[name];
+    let t = ++this.super_t, ret, method = super_.prototype[name];
     ret = method.apply(this, data);
     if (t === this.super_t) {
       this.super_c = null;
@@ -155,34 +135,25 @@ function Class(superCtor, props) {
  * extend object
  * @return {Object} []
  */
-var extend = function extend(target) {
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
+let extend = (target, ...args) => {
   target = target || {};
-  var i = 0,
-      length = args.length,
-      options = undefined,
-      name = undefined,
-      src = undefined,
-      copy = undefined;
-  for (; i < length; i++) {
+  let i = 0, length = args.length, options, name, src, copy;
+  for(; i < length; i++){
     options = args[i];
     if (!options) {
       continue;
     }
-    for (name in options) {
+    for(name in options){
       src = target[name];
       copy = options[name];
       if (src && src === copy) {
         continue;
       }
-      if (isObject(copy)) {
+      if(isObject(copy)){
         target[name] = extend(src && isObject(src) ? src : {}, copy);
-      } else if (isArray(copy)) {
+      }else if(isArray(copy)){
         target[name] = extend([], copy);
-      } else {
+      }else{
         target[name] = copy;
       }
     }
@@ -194,7 +165,7 @@ var extend = function extend(target) {
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isClass = function isClass(obj) {
+let isClass = obj => {
   return isFunction(obj) && isFunction(obj.inherits) && isFunction(obj.extend);
 };
 /**
@@ -202,7 +173,7 @@ var isClass = function isClass(obj) {
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isBoolean = function isBoolean(obj) {
+let isBoolean = obj => {
   return toString.call(obj) === '[object Boolean]';
 };
 /**
@@ -210,7 +181,7 @@ var isBoolean = function isBoolean(obj) {
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isNumber = function isNumber(obj) {
+let isNumber = obj => {
   return toString.call(obj) === '[object Number]';
 };
 /**
@@ -218,7 +189,7 @@ var isNumber = function isNumber(obj) {
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isObject = function isObject(obj) {
+let isObject = obj => {
   if (isBuffer(obj)) {
     return false;
   }
@@ -229,7 +200,7 @@ var isObject = function isObject(obj) {
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isString = function isString(obj) {
+let isString = obj => {
   return toString.call(obj) === '[object String]';
 };
 /**
@@ -237,10 +208,10 @@ var isString = function isString(obj) {
  * @param  {Mixed} data []
  * @return {Mixed}      []
  */
-var clone = function clone(data) {
+let clone = data => {
   if (isObject(data)) {
     return extend({}, data);
-  } else if (isArray(data)) {
+  }else if (isArray(data)) {
     return extend([], data);
   }
   return data;
@@ -250,29 +221,29 @@ var clone = function clone(data) {
  * @param  {String}  p [filepath]
  * @return {Boolean}   []
  */
-var isFile = function isFile(p) {
-  if (!_fs2['default'].existsSync(p)) {
+let isFile = p => {
+  if (!fs.existsSync(p)) {
     return false;
   }
-  return _fs2['default'].statSync(p).isFile();
+  return fs.statSync(p).isFile();
 };
 /**
  * check path is directory
  * @param  {String}  p []
  * @return {Boolean}   []
  */
-var isDir = function isDir(p) {
-  if (!_fs2['default'].existsSync(p)) {
+let isDir = p => {
+  if (!fs.existsSync(p)) {
     return false;
   }
-  return _fs2['default'].statSync(p).isDirectory();
+  return fs.statSync(p).isDirectory();
 };
 /**
  * check object is number string
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isNumberString = function isNumberString(obj) {
+let isNumberString = obj => {
   return numberReg.test(obj);
 };
 /**
@@ -280,46 +251,48 @@ var isNumberString = function isNumberString(obj) {
  * @param  {Mixed}  obj []
  * @return {Boolean}     []
  */
-var isPromise = function isPromise(obj) {
-  return !!(obj && typeof obj.then === 'function' && typeof obj['catch'] === 'function');
+let isPromise = obj => {
+  return !!(obj && typeof obj.then === 'function' && typeof obj.catch === 'function');
 };
 /**
  * check path is writable
  * @param  {Mixed}  p []
  * @return {Boolean}   []
  */
-var isWritable = function isWritable(p) {
-  if (!_fs2['default'].existsSync(p)) {
+let isWritable = p => {
+  if (!fs.existsSync(p)) {
     return false;
   }
-  var stats = _fs2['default'].statSync(p);
-  var mode = stats.mode;
-  var uid = process.getuid ? process.getuid() : 0;
-  var gid = process.getgid ? process.getgid() : 0;
-  var owner = uid === stats.uid;
-  var group = gid === stats.gid;
-  return !!(owner && mode & parseInt('00200', 8) || group && mode & parseInt('00020', 8) || mode & parseInt('00002', 8));
+  let stats = fs.statSync(p);
+  let mode = stats.mode;
+  let uid = process.getuid ? process.getuid() : 0;
+  let gid = process.getgid ? process.getgid() : 0;
+  let owner = uid === stats.uid;
+  let group = gid === stats.gid;
+  return !!(owner && (mode & parseInt('00200', 8)) || 
+      group && (mode & parseInt('00020', 8)) || 
+      (mode & parseInt('00002', 8)));
 };
 /**
  * check object is mepty
  * @param  {[Mixed]}  obj []
  * @return {Boolean}     []
  */
-var isEmpty = function isEmpty(obj) {
+let isEmpty = obj => {
   if (isObject(obj)) {
-    for (var key in obj) {
+    for(let key in obj){
       return !key && !0;
     }
     return true;
-  } else if (isArray(obj)) {
+  }else if (isArray(obj)) {
     return obj.length === 0;
-  } else if (isString(obj)) {
+  }else if (isString(obj)) {
     return obj.length === 0;
-  } else if (isNumber(obj)) {
+  }else if (isNumber(obj)) {
     return obj === 0;
-  } else if (obj === null || obj === undefined) {
+  }else if (obj === null || obj === undefined) {
     return true;
-  } else if (isBoolean(obj)) {
+  }else if (isBoolean(obj)) {
     return !obj;
   }
   return false;
@@ -331,8 +304,8 @@ var isEmpty = function isEmpty(obj) {
  * @param {Mixed} obj
  * @return {Boolean}
  */
-var isGenerator = function isGenerator(obj) {
-  return obj && 'function' === typeof obj.next && 'function' === typeof obj['throw'];
+let isGenerator = obj => {
+  return obj && 'function' === typeof obj.next && 'function' === typeof obj.throw;
 };
 
 /**
@@ -341,15 +314,15 @@ var isGenerator = function isGenerator(obj) {
  * @param {Mixed} obj
  * @return {Boolean}
  */
-var isGeneratorFunction = function isGeneratorFunction(obj) {
+let isGeneratorFunction = obj => {
   if (!obj) {
     return false;
   }
-  var constructor = obj.constructor;
-  if (!constructor) {
+  let constructor = obj.constructor;
+  if (!constructor){
     return false;
   }
-  if ('GeneratorFunction' === constructor.name || 'GeneratorFunction' === constructor.displayName) {
+  if ('GeneratorFunction' === constructor.name || 'GeneratorFunction' === constructor.displayName){
     return true;
   }
   return isGenerator(constructor.prototype);
@@ -361,16 +334,16 @@ var isGeneratorFunction = function isGeneratorFunction(obj) {
  * @param  {mode} mode [path mode]
  * @return {}      []
  */
-var mkdir = function mkdir(p, mode) {
+let mkdir = (p, mode) => {
   mode = mode || '0777';
-  if (_fs2['default'].existsSync(p)) {
+  if (fs.existsSync(p)) {
     chmod(p, mode);
     return true;
   }
-  var pp = _path2['default'].dirname(p);
-  if (_fs2['default'].existsSync(pp)) {
-    _fs2['default'].mkdirSync(p, mode);
-  } else {
+  let pp = path.dirname(p);
+  if (fs.existsSync(pp)) {
+    fs.mkdirSync(p, mode);
+  }else{
     mkdir(pp, mode);
     mkdir(p, mode);
   }
@@ -382,51 +355,39 @@ var mkdir = function mkdir(p, mode) {
  * @param  {Bollean} reserve []
  * @return {Promise}         []
  */
-var rmdir = function rmdir(p, reserve) {
+let rmdir = (p, reserve) => {
   if (!isDir(p)) {
     return Promise.resolve();
   }
-  var deferred = Promise.defer();
-  _fs2['default'].readdir(p, function (err, files) {
+  let deferred = Promise.defer();
+  fs.readdir(p, (err, files) => {
     if (err) {
       return deferred.reject(err);
     }
-    var promises = files.map(function (item) {
-      var filepath = _path2['default'].normalize(p + '/' + item);
+    let promises = files.map(item => {
+      let filepath = path.normalize(p + '/' + item);
       if (isDir(filepath)) {
         return rmdir(filepath, false);
-      } else {
-        var _ret = (function () {
-          var deferred = Promise.defer();
-          _fs2['default'].unlink(filepath, function (err) {
-            return err ? deferred.reject(err) : deferred.resolve();
-          });
-          return {
-            v: deferred.promise
-          };
-        })();
-
-        if (typeof _ret === 'object') return _ret.v;
+      }else{
+        let deferred = Promise.defer();
+        fs.unlink(filepath, err => {
+          return err ? deferred.reject(err) : deferred.resolve();
+        });
+        return deferred.promise;
       }
     });
-    var promise = files.length === 0 ? Promise.resolve() : Promise.all(promises);
-    return promise.then(function () {
+    let promise = files.length === 0 ? Promise.resolve() : Promise.all(promises);
+    return promise.then(() => {
       if (!reserve) {
-        var _ret2 = (function () {
-          var deferred = Promise.defer();
-          _fs2['default'].rmdir(p, function (err) {
-            return err ? deferred.reject(err) : deferred.resolve();
-          });
-          return {
-            v: deferred.promise
-          };
-        })();
-
-        if (typeof _ret2 === 'object') return _ret2.v;
+        let deferred = Promise.defer();
+        fs.rmdir(p, err => {
+          return err ? deferred.reject(err) : deferred.resolve();
+        });
+        return deferred.promise;
       }
-    }).then(function () {
+    }).then(() => {
       deferred.resolve();
-    })['catch'](function (err) {
+    }).catch(err => {
       deferred.reject(err);
     });
   });
@@ -438,20 +399,20 @@ var rmdir = function rmdir(p, reserve) {
  * @param  {} prefix []
  * @return {}        []
  */
-var getFiles = function getFiles(dir, prefix) {
-  dir = _path2['default'].normalize(dir);
-  if (!_fs2['default'].existsSync(dir)) {
+let getFiles = (dir, prefix) => {
+  dir = path.normalize(dir);
+  if (!fs.existsSync(dir)) {
     return [];
   }
   prefix = prefix || '';
-  var files = _fs2['default'].readdirSync(dir);
-  var result = [];
-  files.forEach(function (item) {
-    var stat = _fs2['default'].statSync(dir + '/' + item);
+  let files = fs.readdirSync(dir);
+  let result = [];
+  files.forEach(item => {
+    let stat = fs.statSync(dir + '/' + item);
     if (stat.isFile()) {
       result.push(prefix + item);
-    } else if (stat.isDirectory()) {
-      result = result.concat(getFiles(_path2['default'].normalize(dir + '/' + item), _path2['default'].normalize(prefix + item + '/')));
+    }else if(stat.isDirectory()){
+      result = result.concat(getFiles(path.normalize(dir + '/' + item), path.normalize(prefix + item + '/')));
     }
   });
   return result;
@@ -462,20 +423,20 @@ var getFiles = function getFiles(dir, prefix) {
  * @param  {String} mode [path mode]
  * @return {Boolean}      []
  */
-var chmod = function chmod(p, mode) {
+let chmod = (p, mode) => {
   mode = mode || '0777';
-  if (!_fs2['default'].existsSync(p)) {
+  if (!fs.existsSync(p)) {
     return true;
   }
-  return _fs2['default'].chmodSync(p, mode);
+  return fs.chmodSync(p, mode);
 };
 /**
  * get content md5
  * @param  {String} str [content]
  * @return {String}     [content md5]
  */
-var md5 = function md5(str) {
-  var instance = _crypto2['default'].createHash('md5');
+let md5 = str => {
+  let instance = crypto.createHash('md5');
   instance.update(str + '');
   return instance.digest('hex');
 };
@@ -485,13 +446,13 @@ var md5 = function md5(str) {
  * @param  {Mixed} value []
  * @return {Object}       []
  */
-var getObject = function getObject(key, value) {
-  var obj = {};
+let getObject = (key, value) => {
+  let obj = {};
   if (!isArray(key)) {
     obj[key] = value;
     return obj;
   }
-  key.forEach(function (item, i) {
+  key.forEach((item, i) => {
     obj[item] = value[i];
   });
   return obj;
@@ -503,21 +464,17 @@ var getObject = function getObject(key, value) {
  * @param  {String} valueKey []
  * @return {Mixed}          []
  */
-var arrToObj = function arrToObj(arr, key, valueKey) {
-  var result = {},
-      arrResult = [];
-  var i = 0,
-      length = arr.length,
-      item = undefined,
-      keyValue = undefined;
-  for (; i < length; i++) {
+let arrToObj = (arr, key, valueKey) => {
+  let result = {}, arrResult = [];
+  let i = 0, length = arr.length, item, keyValue;
+  for(; i < length; i++){
     item = arr[i];
     keyValue = item[key];
     if (valueKey === null) {
       arrResult.push(keyValue);
-    } else if (valueKey) {
+    }else if (valueKey) {
       result[keyValue] = item[valueKey];
-    } else {
+    }else{
       result[keyValue] = item;
     }
   }
@@ -528,9 +485,9 @@ var arrToObj = function arrToObj(arr, key, valueKey) {
  * @param  {Object} obj []
  * @return {Array}     []
  */
-var objValues = function objValues(obj) {
-  var values = [];
-  for (var key in obj) {
+let objValues = obj => {
+  let values = [];
+  for(let key in obj){
     if (obj.hasOwnProperty(key)) {
       values.push(obj[key]);
     }
@@ -538,7 +495,8 @@ var objValues = function objValues(obj) {
   return values;
 };
 
-exports['default'] = {
+
+export default {
   Class: Class,
   extend: extend,
   isClass: isClass,
@@ -548,12 +506,12 @@ exports['default'] = {
   isString: isString,
   isArray: isArray,
   isFunction: isFunction,
-  isDate: _util2['default'].isDate,
-  isRegExp: _util2['default'].isRegExp,
-  isError: _util2['default'].isError,
-  isIP: _net2['default'].isIP,
-  isIP4: _net2['default'].isIP4,
-  isIP6: _net2['default'].isIP6,
+  isDate: util.isDate,
+  isRegExp: util.isRegExp,
+  isError: util.isError,
+  isIP: net.isIP,
+  isIP4: net.isIP4,
+  isIP6: net.isIP6,
   isFile: isFile,
   isDir: isDir,
   isNumberString: isNumberString,
@@ -573,4 +531,3 @@ exports['default'] = {
   getFiles: getFiles,
   objValues: objValues
 };
-module.exports = exports['default'];

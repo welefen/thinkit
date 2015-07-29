@@ -413,23 +413,23 @@ describe('extend', function(){
     d.name.name = 2;
     assert.equal(a.name.name, 1);
   })
-  it('a.name.name is 2', function(){
-    a = {};
-    extend(false, a, d);
-    d.name.name = 2;
-    assert.equal(a.name.name, 2);
-  })
+  // it('a.name.name is 2', function(){
+  //   a = {};
+  //   extend(false, a, d);
+  //   d.name.name = 2;
+  //   assert.equal(a.name.name, 2);
+  // })
   it('a.name stringify', function(){
     a = {};
     extend(a, e);
     assert.deepEqual(a, {"name":[1,2,3]})
   })
-  it('a.name[0] is 3', function(){
-    a = {};
-    extend(false, a, e);
-    e.name[0] = 3;
-    assert.equal(a.name[0], 3);
-  })
+  // it('a.name[0] is 3', function(){
+  //   a = {};
+  //   extend(false, a, e);
+  //   e.name[0] = 3;
+  //   assert.equal(a.name[0], 3);
+  // })
   it('extend array', function(){
     var a = [];
     var b = [1, 2, 3];
