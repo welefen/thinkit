@@ -329,6 +329,24 @@ describe('Class', function(){
     assert.equal(i1.data.name, 'suredy');
     assert.equal(i1.value, undefined);
   })
+
+
+  var CLS1 = Class({
+    getName: function(){
+      return arguments.length;
+    }
+  })
+  var CLS2 = Class(CLS1, {
+    getName: function(){
+      return this.super('getName', arguments);
+    }
+  })
+
+  it('super with arguments', function(){
+    var instance = new CLS2();
+    var length = instance.getName(1, 2, 3, 4);
+    assert.equal(length, 4);
+  })
 })
 describe('constructor', function(){
   it('not support constructor', function(){

@@ -118,7 +118,7 @@ function Class(superCtor, props){
     if (!this.super_t) {
       this.super_t = 1;
     }
-    if (!isArray(data)) {
+    if (!isArray(data) && !isArguments(data)) {
       data = arguments.length === 1 ? [] : [data];
     }
     let t = ++this.super_t, ret, method = super_.prototype[name];
@@ -184,6 +184,14 @@ let isBoolean = obj => {
 let isNumber = obj => {
   return toString.call(obj) === '[object Number]';
 };
+/**
+ * is arguments
+ * @param  {[type]} obj [description]
+ * @return {[type]}     [description]
+ */
+let isArguments = obj => {
+  return toString.call(obj) === '[object Arguments]';
+}
 /**
  * check object is object
  * @param  {Mixed}  obj []
