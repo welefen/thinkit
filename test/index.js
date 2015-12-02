@@ -985,11 +985,26 @@ describe('isBuffer', function(){
 
 describe('getFiles', function(){
   it('getFiles', function(){
-    var files = getFiles(__dirname + '/'); 
+    var files = getFiles(__dirname); 
     assert.deepEqual(files.indexOf('index.js') > -1, true);
   })
   it('getFiles empty', function(){
     var files = getFiles(__dirname + '/dddd/'); 
+    assert.deepEqual(files, []);
+  })
+  it('getFiles with filter', function(){
+    var files = getFiles(path.dirname(__dirname) + '/src', function(file){
+      return true;
+    }); 
+    assert.deepEqual(files, ['index.js']);
+  })
+  it('getFiles with filter 1', function(){
+    var files = getFiles(path.dirname(__dirname) + '/src', function(file){
+      if(file.indexOf('.js') > -1){
+        return;
+      }
+      return true;
+    }); 
     assert.deepEqual(files, []);
   })
 })

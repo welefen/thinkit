@@ -410,10 +410,14 @@ let rmdir = (p, reserve) => {
  * @param  {} prefix []
  * @return {}        []
  */
-let getFiles = (dir, prefix) => {
+let getFiles = (dir, prefix, filter) => {
   dir = path.normalize(dir);
   if (!fs.existsSync(dir)) {
     return [];
+  }
+  if(isFunction(prefix)){
+    filter = prefix;
+    prefix = '';
   }
   prefix = prefix || '';
   let files = fs.readdirSync(dir);
@@ -421,9 +425,14 @@ let getFiles = (dir, prefix) => {
   files.forEach(item => {
     let stat = fs.statSync(dir + sep + item);
     if (stat.isFile()) {
-      result.push(prefix + item);
+      if(!filter || filter(item)){
+        result.push(prefix + item);
+      }
     }else if(stat.isDirectory()){
-      result = result.concat(getFiles(path.normalize(dir + sep + item), path.normalize(prefix + item + sep)));
+      if(!filter || filter(item, true)){
+        let cFiles = getFiles(dir + sep + item, prefix + item + sep, filter);
+        result = result.concat(cFiles);
+      }
     }
   });
   return result;
