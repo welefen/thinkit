@@ -18,7 +18,7 @@
     "email": "welefen@gmail.com"
   }],
   "dependencies": {
-    "es6-promise": "2.0.0"
+
   },
   "devDependencies": {
     "should": "4.0.4",

@@ -12,21 +12,21 @@ let isArray = Array.isArray;
 let isBuffer = Buffer.isBuffer;
 let numberReg = /^((\-?\d*\.?\d*(?:e[+-]?\d*(?:\d?\.?|\.?\d?)\d*)?)|(0[0-7]+)|(0x[0-9a-f]+))$/i;
 
-if (!global.Promise) {
-  global.Promise = require('es6-promise').Promise;
-}
+// if (!global.Promise) {
+//   global.Promise = require('es6-promise').Promise;
+// }
 
-//Promise defer
-if (!Promise.defer) {
-  Promise.defer = () => {
-    let deferred = {};
-    deferred.promise = new Promise((resolve, reject) => {
-      deferred.resolve = resolve;
-      deferred.reject = reject;
-    });
-    return deferred;
-  };
-}
+// //Promise defer
+// if (!Promise.defer) {
+//   Promise.defer = () => {
+//     let deferred = {};
+//     deferred.promise = new Promise((resolve, reject) => {
+//       deferred.resolve = resolve;
+//       deferred.reject = reject;
+//     });
+//     return deferred;
+//   };
+// }
 
 
 /**
@@ -511,7 +511,7 @@ let htmlMaps = {
   '"': '&quote;',
   '\'': '&#39;'
 };
-let escape_html = str => {
+let escapeHtml = str => {
   return (str + '').replace(/[<>'"]/g, a => {
     return htmlMaps[a];
   });
