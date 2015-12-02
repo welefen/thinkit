@@ -6,6 +6,7 @@ import util from 'util';
 import crypto from 'crypto';
 import net from 'net';
 
+let {sep} = path;
 let toString = Object.prototype.toString;
 let isArray = Array.isArray;
 let isBuffer = Buffer.isBuffer;
@@ -35,6 +36,15 @@ if (!Promise.defer) {
  */
 let isFunction = obj => {
   return typeof obj === 'function';
+};
+
+/**
+ * is arguments
+ * @param  {[type]} obj [description]
+ * @return {[type]}     [description]
+ */
+let isArguments = obj => {
+  return toString.call(obj) === '[object Arguments]';
 };
 
 /**
@@ -184,14 +194,7 @@ let isBoolean = obj => {
 let isNumber = obj => {
   return toString.call(obj) === '[object Number]';
 };
-/**
- * is arguments
- * @param  {[type]} obj [description]
- * @return {[type]}     [description]
- */
-let isArguments = obj => {
-  return toString.call(obj) === '[object Arguments]';
-}
+
 /**
  * check object is object
  * @param  {Mixed}  obj []
@@ -312,9 +315,9 @@ let isEmpty = obj => {
  * @param {Mixed} obj
  * @return {Boolean}
  */
-let isGenerator = obj => {
-  return obj && 'function' === typeof obj.next && 'function' === typeof obj.throw;
-};
+// let isGenerator = obj => {
+//   return obj && 'function' === typeof obj.next && 'function' === typeof obj.throw;
+// };
 
 /**
  * Check if `obj` is a generator function.
@@ -322,19 +325,19 @@ let isGenerator = obj => {
  * @param {Mixed} obj
  * @return {Boolean}
  */
-let isGeneratorFunction = obj => {
-  if (!obj) {
-    return false;
-  }
-  let constructor = obj.constructor;
-  if (!constructor){
-    return false;
-  }
-  if ('GeneratorFunction' === constructor.name || 'GeneratorFunction' === constructor.displayName){
-    return true;
-  }
-  return isGenerator(constructor.prototype);
-};
+// let isGeneratorFunction = obj => {
+//   if (!obj) {
+//     return false;
+//   }
+//   let constructor = obj.constructor;
+//   if (!constructor){
+//     return false;
+//   }
+//   if ('GeneratorFunction' === constructor.name || 'GeneratorFunction' === constructor.displayName){
+//     return true;
+//   }
+//   return isGenerator(constructor.prototype);
+// };
 
 /**
  * make dir recursive
@@ -373,7 +376,7 @@ let rmdir = (p, reserve) => {
       return deferred.reject(err);
     }
     let promises = files.map(item => {
-      let filepath = path.normalize(p + '/' + item);
+      let filepath = path.normalize(p + sep + item);
       if (isDir(filepath)) {
         return rmdir(filepath, false);
       }else{
@@ -416,11 +419,11 @@ let getFiles = (dir, prefix) => {
   let files = fs.readdirSync(dir);
   let result = [];
   files.forEach(item => {
-    let stat = fs.statSync(dir + '/' + item);
+    let stat = fs.statSync(dir + sep + item);
     if (stat.isFile()) {
       result.push(prefix + item);
     }else if(stat.isDirectory()){
-      result = result.concat(getFiles(path.normalize(dir + '/' + item), path.normalize(prefix + item + '/')));
+      result = result.concat(getFiles(path.normalize(dir + sep + item), path.normalize(prefix + item + sep)));
     }
   });
   return result;
@@ -454,17 +457,17 @@ let md5 = str => {
  * @param  {Mixed} value []
  * @return {Object}       []
  */
-let getObject = (key, value) => {
-  let obj = {};
-  if (!isArray(key)) {
-    obj[key] = value;
-    return obj;
-  }
-  key.forEach((item, i) => {
-    obj[item] = value[i];
-  });
-  return obj;
-};
+// let getObject = (key, value) => {
+//   let obj = {};
+//   if (!isArray(key)) {
+//     obj[key] = value;
+//     return obj;
+//   }
+//   key.forEach((item, i) => {
+//     obj[item] = value[i];
+//   });
+//   return obj;
+// };
 /**
  * transform array to object
  * @param  {Arrat} arr      []
@@ -472,48 +475,58 @@ let getObject = (key, value) => {
  * @param  {String} valueKey []
  * @return {Mixed}          []
  */
-let arrToObj = (arr, key, valueKey) => {
-  let result = {}, arrResult = [];
-  let i = 0, length = arr.length, item, keyValue;
-  for(; i < length; i++){
-    item = arr[i];
-    keyValue = item[key];
-    if (valueKey === null) {
-      arrResult.push(keyValue);
-    }else if (valueKey) {
-      result[keyValue] = item[valueKey];
-    }else{
-      result[keyValue] = item;
-    }
-  }
-  return valueKey === null ? arrResult : result;
-};
+// let arrToObj = (arr, key, valueKey) => {
+//   let result = {}, arrResult = [];
+//   let i = 0, length = arr.length, item, keyValue;
+//   for(; i < length; i++){
+//     item = arr[i];
+//     keyValue = item[key];
+//     if (valueKey === null) {
+//       arrResult.push(keyValue);
+//     }else if (valueKey) {
+//       result[keyValue] = item[valueKey];
+//     }else{
+//       result[keyValue] = item;
+//     }
+//   }
+//   return valueKey === null ? arrResult : result;
+// };
 /**
  * get object values
  * @param  {Object} obj []
  * @return {Array}     []
  */
-let objValues = obj => {
-  let values = [];
-  for(let key in obj){
-    if (obj.hasOwnProperty(key)) {
-      values.push(obj[key]);
-    }
-  }
-  return values;
+// let objValues = obj => {
+//   let values = [];
+//   for(let key in obj){
+//     if (obj.hasOwnProperty(key)) {
+//       values.push(obj[key]);
+//     }
+//   }
+//   return values;
+// };
+let htmlMaps = {
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quote;',
+  '\'': '&#39;'
+};
+let escape_html = str => {
+  return (str + '').replace(/[<>'"]/g, a => {
+    return htmlMaps[a];
+  });
 };
 
-
 export default {
-  Class: Class,
-  extend: extend,
-  isClass: isClass,
-  isBoolean: isBoolean,
-  isNumber: isNumber,
-  isObject: isObject,
-  isString: isString,
-  isArray: isArray,
-  isFunction: isFunction,
+  Class,
+  extend,
+  isClass,
+  isBoolean,
+  isNumber,
+  isObject,
+  isString,
+  isArray,
+  isFunction,
   isDate: util.isDate,
   isRegExp: util.isRegExp,
   isError: util.isError,
@@ -521,21 +534,22 @@ export default {
   isIP4: net.isIP4,
   isIP6: net.isIP6,
   isFile: isFile,
-  isDir: isDir,
-  isNumberString: isNumberString,
-  isPromise: isPromise,
-  isWritable: isWritable,
-  isBuffer: isBuffer,
-  isEmpty: isEmpty,
-  isGenerator: isGenerator,
-  isGeneratorFunction: isGeneratorFunction,
-  clone: clone,
-  mkdir: mkdir,
-  rmdir: rmdir,
-  md5: md5,
-  chmod: chmod,
-  getObject: getObject,
-  arrToObj: arrToObj,
-  getFiles: getFiles,
-  objValues: objValues
+  isDir,
+  isNumberString,
+  isPromise,
+  isWritable,
+  isBuffer,
+  isEmpty,
+  clone,
+  mkdir,
+  rmdir,
+  md5,
+  chmod,
+  getFiles,
+  escapeHtml
+  // getObject: getObject,
+  // arrToObj: arrToObj,
+  // isGenerator,
+  // isGeneratorFunction,
+  // objValues: objValues
 };

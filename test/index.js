@@ -834,31 +834,31 @@ describe('isPromise', function(){
 
 
 
-describe('getObject', function(){
-  it('getObject()', function(){
-    assert.equal(JSON.stringify(getObject()), '{}');
-  })
-  it('getObject("welefen", "suredy")', function(){
-    var data = getObject('welefen', 'suredy');
-    assert.equal(data.welefen, 'suredy')
-    assert.equal(Object.keys(data).join(''), 'welefen')
-  })
-  it('getObject(["name", "value"], ["welefen", "1"])', function(){
-    var data = getObject(['name', 'value'], ['welefen', '1']);
-    assert.equal(data.name, 'welefen');
-    assert.equal(data.value, '1');
-    assert.equal(JSON.stringify(data), '{"name":"welefen","value":"1"}')
-  })
-  it('getObject(["name", "value"], ["welefen"])', function(){
-    var data = getObject(['name', 'value'], ['welefen'])
-    assert.equal(JSON.stringify(data), '{"name":"welefen"}');
-    assert.equal(data.value, undefined)
-  })
-  it('getObject(["name"], ["welefen", 1])', function(){
-    var data = getObject(['name'], ['welefen', 1]);
-    assert.equal(JSON.stringify(data), '{"name":"welefen"}')
-  })
-})
+// describe('getObject', function(){
+//   it('getObject()', function(){
+//     assert.equal(JSON.stringify(getObject()), '{}');
+//   })
+//   it('getObject("welefen", "suredy")', function(){
+//     var data = getObject('welefen', 'suredy');
+//     assert.equal(data.welefen, 'suredy')
+//     assert.equal(Object.keys(data).join(''), 'welefen')
+//   })
+//   it('getObject(["name", "value"], ["welefen", "1"])', function(){
+//     var data = getObject(['name', 'value'], ['welefen', '1']);
+//     assert.equal(data.name, 'welefen');
+//     assert.equal(data.value, '1');
+//     assert.equal(JSON.stringify(data), '{"name":"welefen","value":"1"}')
+//   })
+//   it('getObject(["name", "value"], ["welefen"])', function(){
+//     var data = getObject(['name', 'value'], ['welefen'])
+//     assert.equal(JSON.stringify(data), '{"name":"welefen"}');
+//     assert.equal(data.value, undefined)
+//   })
+//   it('getObject(["name"], ["welefen", 1])', function(){
+//     var data = getObject(['name'], ['welefen', 1]);
+//     assert.equal(JSON.stringify(data), '{"name":"welefen"}')
+//   })
+// })
 
 describe('mkdir', function(){
   it('mkdir 1 grade path', function(done){
@@ -957,31 +957,31 @@ describe('isBuffer', function(){
   });
 })
 
-describe('arrToObj', function(){
-  var data = [{
-    name: 'welefen',
-    value: 1
-  }, {
-    name: 'suredy',
-    value: 2
-  }]
-  it('arrToObj("name")', function(){
-    var res = arrToObj(data, 'name');
-    assert.equal(JSON.stringify(res), '{"welefen":{"name":"welefen","value":1},"suredy":{"name":"suredy","value":2}}')
-  })
-  it('arrToObj("name", "value")', function(){
-    var res = arrToObj(data, 'name', 'value');
-    assert.equal(JSON.stringify(res), '{"welefen":1,"suredy":2}')
-  })
-  it('arrToObj("name", null)', function(){
-    var res = arrToObj(data, 'name', null);
-    assert.equal(JSON.stringify(res), '["welefen","suredy"]')
-  })
-  it('arrToObj("value", null)', function(){
-    var res = arrToObj(data, 'value', null);
-    assert.equal(JSON.stringify(res), '[1,2]')
-  })
-})
+// describe('arrToObj', function(){
+//   var data = [{
+//     name: 'welefen',
+//     value: 1
+//   }, {
+//     name: 'suredy',
+//     value: 2
+//   }]
+//   it('arrToObj("name")', function(){
+//     var res = arrToObj(data, 'name');
+//     assert.equal(JSON.stringify(res), '{"welefen":{"name":"welefen","value":1},"suredy":{"name":"suredy","value":2}}')
+//   })
+//   it('arrToObj("name", "value")', function(){
+//     var res = arrToObj(data, 'name', 'value');
+//     assert.equal(JSON.stringify(res), '{"welefen":1,"suredy":2}')
+//   })
+//   it('arrToObj("name", null)', function(){
+//     var res = arrToObj(data, 'name', null);
+//     assert.equal(JSON.stringify(res), '["welefen","suredy"]')
+//   })
+//   it('arrToObj("value", null)', function(){
+//     var res = arrToObj(data, 'value', null);
+//     assert.equal(JSON.stringify(res), '[1,2]')
+//   })
+// })
 
 describe('getFiles', function(){
   it('getFiles', function(){
@@ -994,13 +994,13 @@ describe('getFiles', function(){
   })
 })
 
-describe('objValues', function(){
-  it('objValues', function(){
-    var value = objValues({name: '111'}); 
-    assert.deepEqual(value, ['111']);
-  })
-  it('objValues, data empty', function(){
-    var value = objValues({}); 
-    assert.deepEqual(value, []);
-  })
-})
+// describe('objValues', function(){
+//   it('objValues', function(){
+//     var value = objValues({name: '111'}); 
+//     assert.deepEqual(value, ['111']);
+//   })
+//   it('objValues, data empty', function(){
+//     var value = objValues({}); 
+//     assert.deepEqual(value, []);
+//   })
+// })
