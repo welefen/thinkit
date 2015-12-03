@@ -415,9 +415,14 @@ let getFiles = (dir, prefix, filter) => {
   if (!fs.existsSync(dir)) {
     return [];
   }
-  if(isFunction(prefix)){
+  if(!isString(prefix)){
     filter = prefix;
     prefix = '';
+  }
+  if(filter === true){
+    filter = item => {
+      return item[0] !== '.';
+    }
   }
   prefix = prefix || '';
   let files = fs.readdirSync(dir);
