@@ -12,21 +12,6 @@ let isArray = Array.isArray;
 let isBuffer = Buffer.isBuffer;
 let numberReg = /^((\-?\d*\.?\d*(?:e[+-]?\d*(?:\d?\.?|\.?\d?)\d*)?)|(0[0-7]+)|(0x[0-9a-f]+))$/i;
 
-// if (!global.Promise) {
-//   global.Promise = require('es6-promise').Promise;
-// }
-
-// //Promise defer
-// if (!Promise.defer) {
-//   Promise.defer = () => {
-//     let deferred = {};
-//     deferred.promise = new Promise((resolve, reject) => {
-//       deferred.resolve = resolve;
-//       deferred.reject = reject;
-//     });
-//     return deferred;
-//   };
-// }
 
 
 /**
@@ -169,6 +154,20 @@ let extend = (target, ...args) => {
     }
   }
   return target;
+};
+
+/**
+ * camelCase string
+ * @param  {String} str []
+ * @return {String}     []
+ */
+let camelCase = str => {
+  if(str.indexOf('_') > -1){
+    str = str.replace(/_(\w)/g, (a, b) => {
+      return b.toUpperCase();
+    });
+  }
+  return str;
 };
 /**
  * check object is class
@@ -422,7 +421,7 @@ let getFiles = (dir, prefix, filter) => {
   if(filter === true){
     filter = item => {
       return item[0] !== '.';
-    }
+    };
   }
   prefix = prefix || '';
   let files = fs.readdirSync(dir);
@@ -465,60 +464,21 @@ let md5 = str => {
   instance.update(str + '');
   return instance.digest('hex');
 };
+
 /**
- * get object by key & value
- * @param  {String} key   []
- * @param  {Mixed} value []
- * @return {Object}       []
+ * get deferred object
+ * @return {Object} []
  */
-// let getObject = (key, value) => {
-//   let obj = {};
-//   if (!isArray(key)) {
-//     obj[key] = value;
-//     return obj;
-//   }
-//   key.forEach((item, i) => {
-//     obj[item] = value[i];
-//   });
-//   return obj;
-// };
-/**
- * transform array to object
- * @param  {Arrat} arr      []
- * @param  {String} key      []
- * @param  {String} valueKey []
- * @return {Mixed}          []
- */
-// let arrToObj = (arr, key, valueKey) => {
-//   let result = {}, arrResult = [];
-//   let i = 0, length = arr.length, item, keyValue;
-//   for(; i < length; i++){
-//     item = arr[i];
-//     keyValue = item[key];
-//     if (valueKey === null) {
-//       arrResult.push(keyValue);
-//     }else if (valueKey) {
-//       result[keyValue] = item[valueKey];
-//     }else{
-//       result[keyValue] = item;
-//     }
-//   }
-//   return valueKey === null ? arrResult : result;
-// };
-/**
- * get object values
- * @param  {Object} obj []
- * @return {Array}     []
- */
-// let objValues = obj => {
-//   let values = [];
-//   for(let key in obj){
-//     if (obj.hasOwnProperty(key)) {
-//       values.push(obj[key]);
-//     }
-//   }
-//   return values;
-// };
+let defer = () => {
+  let deferred = {};
+  deferred.promise = new Promise((resolve, reject) => {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
+  });
+  return deferred;
+};
+
+
 let htmlMaps = {
   '<': '&lt;',
   '>': '&gt;',
@@ -531,7 +491,40 @@ let escapeHtml = str => {
   });
 };
 
+/**
+ * make callback function to promise
+ * @param  {Function} fn       []
+ * @param  {Object}   receiver []
+ * @return {Promise}            []
+ */
+let promisify = (fn, receiver) => {
+  return (...args) => {
+    return new Promise((resolve, reject) => {
+      fn.apply(receiver, [...args, (err, res) => {
+        return err ? reject(err) : resolve(res);
+      }]);
+    });
+  };
+};
+
+/**
+ * to fast properties
+ * @param  {Object} obj []
+ * @return {void}     []
+ */
+let toFastProperties = obj => {
+  let f = () => {};
+  f.prototype = obj;
+  /*eslint-disable no-new*/
+  new f();
+};
+
 export default {
+  toFastProperties,
+  promisify,
+  sep,
+  camelCase,
+  defer,
   Class,
   extend,
   isClass,
@@ -561,9 +554,4 @@ export default {
   chmod,
   getFiles,
   escapeHtml
-  // getObject: getObject,
-  // arrToObj: arrToObj,
-  // isGenerator,
-  // isGeneratorFunction,
-  // objValues: objValues
 };
