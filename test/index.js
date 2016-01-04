@@ -431,23 +431,11 @@ describe('extend', function(){
     d.name.name = 2;
     assert.equal(a.name.name, 1);
   })
-  // it('a.name.name is 2', function(){
-  //   a = {};
-  //   extend(false, a, d);
-  //   d.name.name = 2;
-  //   assert.equal(a.name.name, 2);
-  // })
   it('a.name stringify', function(){
     a = {};
     extend(a, e);
     assert.deepEqual(a, {"name":[1,2,3]})
   })
-  // it('a.name[0] is 3', function(){
-  //   a = {};
-  //   extend(false, a, e);
-  //   e.name[0] = 3;
-  //   assert.equal(a.name[0], 3);
-  // })
   it('extend array', function(){
     var a = [];
     var b = [1, 2, 3];
@@ -834,32 +822,6 @@ describe('isPromise', function(){
 
 
 
-// describe('getObject', function(){
-//   it('getObject()', function(){
-//     assert.equal(JSON.stringify(getObject()), '{}');
-//   })
-//   it('getObject("welefen", "suredy")', function(){
-//     var data = getObject('welefen', 'suredy');
-//     assert.equal(data.welefen, 'suredy')
-//     assert.equal(Object.keys(data).join(''), 'welefen')
-//   })
-//   it('getObject(["name", "value"], ["welefen", "1"])', function(){
-//     var data = getObject(['name', 'value'], ['welefen', '1']);
-//     assert.equal(data.name, 'welefen');
-//     assert.equal(data.value, '1');
-//     assert.equal(JSON.stringify(data), '{"name":"welefen","value":"1"}')
-//   })
-//   it('getObject(["name", "value"], ["welefen"])', function(){
-//     var data = getObject(['name', 'value'], ['welefen'])
-//     assert.equal(JSON.stringify(data), '{"name":"welefen"}');
-//     assert.equal(data.value, undefined)
-//   })
-//   it('getObject(["name"], ["welefen", 1])', function(){
-//     var data = getObject(['name'], ['welefen', 1]);
-//     assert.equal(JSON.stringify(data), '{"name":"welefen"}')
-//   })
-// })
-
 describe('mkdir', function(){
   it('mkdir 1 grade path', function(done){
     var dir = __dirname + '/fasdfasdf/';
@@ -957,31 +919,6 @@ describe('isBuffer', function(){
   });
 })
 
-// describe('arrToObj', function(){
-//   var data = [{
-//     name: 'welefen',
-//     value: 1
-//   }, {
-//     name: 'suredy',
-//     value: 2
-//   }]
-//   it('arrToObj("name")', function(){
-//     var res = arrToObj(data, 'name');
-//     assert.equal(JSON.stringify(res), '{"welefen":{"name":"welefen","value":1},"suredy":{"name":"suredy","value":2}}')
-//   })
-//   it('arrToObj("name", "value")', function(){
-//     var res = arrToObj(data, 'name', 'value');
-//     assert.equal(JSON.stringify(res), '{"welefen":1,"suredy":2}')
-//   })
-//   it('arrToObj("name", null)', function(){
-//     var res = arrToObj(data, 'name', null);
-//     assert.equal(JSON.stringify(res), '["welefen","suredy"]')
-//   })
-//   it('arrToObj("value", null)', function(){
-//     var res = arrToObj(data, 'value', null);
-//     assert.equal(JSON.stringify(res), '[1,2]')
-//   })
-// })
 
 describe('getFiles', function(){
   it('getFiles', function(){
@@ -1009,13 +946,43 @@ describe('getFiles', function(){
   })
 })
 
-// describe('objValues', function(){
-//   it('objValues', function(){
-//     var value = objValues({name: '111'}); 
-//     assert.deepEqual(value, ['111']);
-//   })
-//   it('objValues, data empty', function(){
-//     var value = objValues({}); 
-//     assert.deepEqual(value, []);
-//   })
-// })
+describe('toFastProperties', function(){
+  it('is function', function(){
+    assert.equal(isFunction(global.toFastProperties), true)
+  })
+  it('return undefined', function(){
+    assert.equal(toFastProperties(), undefined)
+  })
+})
+
+describe('isIP4', function(){
+  it('is function', function(){
+    assert.equal(isFunction(global.isIP4), true)
+  })
+  it('is isIP4 true', function(){
+    assert.equal(isIP4('127.0.0.1'), true)
+  })
+  it('is isIP4 false', function(){
+    assert.equal(isIP4('127.0.0.1xxx'), false)
+  })
+})
+
+describe('promisify', function(){
+  it('is function', function(){
+    assert.equal(isFunction(global.promisify), true)
+  })
+  it('is promise then', function(){
+    var readFile = require('fs').readFile;
+    var fn = promisify(readFile)('xxxx');
+    assert.equal(isFunction(fn.then), true)
+    assert.equal(isFunction(fn.catch), true)
+  })
+  it('is promise catch', function(){
+    var readFile = require('fs').readFile;
+    var fn = promisify(readFile)(__filename);
+    assert.equal(isFunction(fn.then), true)
+    assert.equal(isFunction(fn.catch), true)
+  })
+})
+
+
