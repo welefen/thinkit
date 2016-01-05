@@ -299,7 +299,7 @@ let isEmpty = obj => {
   }else if (isString(obj)) {
     return obj.length === 0;
   }else if (isNumber(obj)) {
-    return obj === 0;
+    return isNaN(obj) || obj === 0;
   }else if (obj === null || obj === undefined) {
     return true;
   }else if (isBoolean(obj)) {
