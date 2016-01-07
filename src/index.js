@@ -359,6 +359,20 @@ let mkdir = (p, mode) => {
   }
   return true;
 };
+
+/**
+ * get deferred object
+ * @return {Object} []
+ */
+let defer = () => {
+  let deferred = {};
+  deferred.promise = new Promise((resolve, reject) => {
+    deferred.resolve = resolve;
+    deferred.reject = reject;
+  });
+  return deferred;
+};
+
 /**
  * remove dir aync
  * @param  {String} p       [path]
@@ -369,7 +383,7 @@ let rmdir = (p, reserve) => {
   if (!isDir(p)) {
     return Promise.resolve();
   }
-  let deferred = Promise.defer();
+  let deferred = defer();
   fs.readdir(p, (err, files) => {
     if (err) {
       return deferred.reject(err);
@@ -379,7 +393,7 @@ let rmdir = (p, reserve) => {
       if (isDir(filepath)) {
         return rmdir(filepath, false);
       }else{
-        let deferred = Promise.defer();
+        let deferred = defer();
         fs.unlink(filepath, err => {
           return err ? deferred.reject(err) : deferred.resolve();
         });
@@ -389,7 +403,7 @@ let rmdir = (p, reserve) => {
     let promise = files.length === 0 ? Promise.resolve() : Promise.all(promises);
     return promise.then(() => {
       if (!reserve) {
-        let deferred = Promise.defer();
+        let deferred = defer();
         fs.rmdir(p, err => {
           return err ? deferred.reject(err) : deferred.resolve();
         });
@@ -465,18 +479,7 @@ let md5 = str => {
   return instance.digest('hex');
 };
 
-/**
- * get deferred object
- * @return {Object} []
- */
-let defer = () => {
-  let deferred = {};
-  deferred.promise = new Promise((resolve, reject) => {
-    deferred.resolve = resolve;
-    deferred.reject = reject;
-  });
-  return deferred;
-};
+
 
 
 let htmlMaps = {
