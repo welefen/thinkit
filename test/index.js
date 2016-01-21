@@ -659,6 +659,33 @@ describe('isError', function(){
   })
 })
 
+describe('isTrueEmpty', function(){
+  it('isTrueEmpty(undefined) === true', function(){
+    assert.equal(isTrueEmpty(undefined), true)
+  })
+  it('isTrueEmpty(null) === true', function(){
+    assert.equal(isTrueEmpty(null), true)
+  })
+  it('isTrueEmpty(null) === true', function(){
+    assert.equal(isTrueEmpty(null), true)
+  })
+  it('isTrueEmpty(NaN) === true', function(){
+    assert.equal(isTrueEmpty(NaN), true)
+  })
+  it('isTrueEmpty(0) === false', function(){
+    assert.equal(isTrueEmpty(0), false)
+  })
+  it('isTrueEmpty({}) === false', function(){
+    assert.equal(isTrueEmpty({}), false)
+  })
+  it('isTrueEmpty([]) === false', function(){
+    assert.equal(isTrueEmpty([]), false)
+  })
+  it('isTrueEmpty(false) === false', function(){
+    assert.equal(isTrueEmpty(false), false)
+  })
+})
+
 describe('isEmpty', function(){
   it('isEmpty(0) = true', function(){
     assert.equal(isEmpty(0), true);

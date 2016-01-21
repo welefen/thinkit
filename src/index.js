@@ -283,12 +283,31 @@ let isWritable = p => {
       group && (mode & parseInt('00020', 8)) || 
       (mode & parseInt('00002', 8)));
 };
+
+/**
+ * true empty
+ * @param  {Mixed} obj []
+ * @return {Boolean}     []
+ */
+let isTrueEmpty = obj => {
+  if(obj === undefined || obj === null || obj === ''){
+    return true;
+  }
+  if(isNumber(obj) && isNaN(obj)){
+    return true;
+  }
+  return false;
+};
 /**
  * check object is mepty
  * @param  {[Mixed]}  obj []
  * @return {Boolean}     []
  */
 let isEmpty = obj => {
+  if(isTrueEmpty(obj)){
+    return true;
+  }
+
   if (isObject(obj)) {
     for(let key in obj){
       return !key && !0;
@@ -299,9 +318,7 @@ let isEmpty = obj => {
   }else if (isString(obj)) {
     return obj.length === 0;
   }else if (isNumber(obj)) {
-    return isNaN(obj) || obj === 0;
-  }else if (obj === null || obj === undefined) {
-    return true;
+    return obj === 0;
   }else if (isBoolean(obj)) {
     return !obj;
   }
@@ -549,6 +566,7 @@ export default {
   isPromise,
   isWritable,
   isBuffer,
+  isTrueEmpty,
   isEmpty,
   clone,
   mkdir,
