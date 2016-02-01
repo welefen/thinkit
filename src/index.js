@@ -13,6 +13,21 @@ let isBuffer = Buffer.isBuffer;
 let numberReg = /^((\-?\d*\.?\d*(?:e[+-]?\d*(?:\d?\.?|\.?\d?)\d*)?)|(0[0-7]+)|(0x[0-9a-f]+))$/i;
 
 
+/**
+ * make callback function to promise
+ * @param  {Function} fn       []
+ * @param  {Object}   receiver []
+ * @return {Promise}            []
+ */
+let promisify = (fn, receiver) => {
+  return (...args) => {
+    return new Promise((resolve, reject) => {
+      fn.apply(receiver, [...args, (err, res) => {
+        return err ? reject(err) : resolve(res);
+      }]);
+    });
+  };
+};
 
 /**
  * check object is function
@@ -232,22 +247,50 @@ let clone = data => {
  * @return {Boolean}   []
  */
 let isFile = p => {
-  if (!fs.existsSync(p)) {
-    return false;
-  }
-  return fs.statSync(p).isFile();
+  try{
+    return fs.statSync(p).isFile();
+  }catch(e){}
+  return false;
 };
+
+/**
+ * check path is file in async mode
+ * @param  {String} p []
+ * @return {Boolean}   []
+ */
+let isFileAsync = p => {
+  return promisify(fs.stat, fs)(p).then(stat => {
+    return stat.isFile();
+  }).catch(() => {
+    return false;
+  });
+};
+
 /**
  * check path is directory
  * @param  {String}  p []
  * @return {Boolean}   []
  */
 let isDir = p => {
-  if (!fs.existsSync(p)) {
-    return false;
-  }
-  return fs.statSync(p).isDirectory();
+  try{
+    return fs.statSync(p).isDirectory();
+  }catch(e){}
+  return false;
 };
+
+/**
+ * check path is file in async mode
+ * @param  {String} p []
+ * @return {Boolean}   []
+ */
+let isDirAsync = p => {
+  return promisify(fs.stat, fs)(p).then(stat => {
+    return stat.isDirectory();
+  }).catch(() => {
+    return false;
+  });
+};
+
 /**
  * check object is number string
  * @param  {Mixed}  obj []
@@ -325,35 +368,6 @@ let isEmpty = obj => {
   return false;
 };
 
-/**
- * Check if `obj` is a generator.
- *
- * @param {Mixed} obj
- * @return {Boolean}
- */
-// let isGenerator = obj => {
-//   return obj && 'function' === typeof obj.next && 'function' === typeof obj.throw;
-// };
-
-/**
- * Check if `obj` is a generator function.
- *
- * @param {Mixed} obj
- * @return {Boolean}
- */
-// let isGeneratorFunction = obj => {
-//   if (!obj) {
-//     return false;
-//   }
-//   let constructor = obj.constructor;
-//   if (!constructor){
-//     return false;
-//   }
-//   if ('GeneratorFunction' === constructor.name || 'GeneratorFunction' === constructor.displayName){
-//     return true;
-//   }
-//   return isGenerator(constructor.prototype);
-// };
 
 /**
  * make dir recursive
@@ -512,20 +526,22 @@ let escapeHtml = str => {
 };
 
 /**
- * make callback function to promise
- * @param  {Function} fn       []
- * @param  {Object}   receiver []
- * @return {Promise}            []
+ * get datetime
+ * @param  {Date} date []
+ * @return {String}      []
  */
-let promisify = (fn, receiver) => {
-  return (...args) => {
-    return new Promise((resolve, reject) => {
-      fn.apply(receiver, [...args, (err, res) => {
-        return err ? reject(err) : resolve(res);
-      }]);
-    });
+let datetime = date => {
+  let fn = d => {
+    return ('0' + d).slice(-2);
   };
+
+  let d = date || new Date();
+  let dateStr = `${d.getFullYear()}-${fn(d.getMonth() + 1)}-${fn(d.getDate())}`;
+  let timeStr = `${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`;
+  return dateStr + ' ' + timeStr;
 };
+
+
 
 /**
  * to fast properties
@@ -560,8 +576,10 @@ export default {
   isIP: net.isIP,
   isIP4: net.isIPv4,
   isIP6: net.isIPv6,
-  isFile: isFile,
+  isFile,
+  isFileAsync,
   isDir,
+  isDirAsync,
   isNumberString,
   isPromise,
   isWritable,
@@ -574,5 +592,6 @@ export default {
   md5,
   chmod,
   getFiles,
-  escapeHtml
+  escapeHtml,
+  datetime
 };

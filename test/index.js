@@ -1015,4 +1015,50 @@ describe('promisify', function(){
   })
 })
 
+describe('datetime', function(){
+  it('is function', function(){
+    assert.equal(isFunction(global.datetime), true)
+  })
+  it('datetime type', function(){
+    var value = datetime();
+    assert.equal(/^\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}$/.test(value), true)
+  })
+})
+
+
+describe('isFileAsync', function(){
+  it('is function', function(){
+    assert.equal(isFunction(global.isFileAsync), true)
+  })
+  it('isFileAsync true', function(done){
+    isFileAsync(__filename).then(function(data){
+      assert.equal(data, true)
+      done();
+    })
+  })
+  it('isFileAsync false', function(done){
+    isFileAsync(__filename + '/dfasdfasdf').then(function(data){
+      assert.equal(data, false)
+      done();
+    })
+  })
+})
+
+describe('isDirAsync', function(){
+  it('is function', function(){
+    assert.equal(isFunction(global.isDirAsync), true)
+  })
+  it('isDirAsync false', function(done){
+    isDirAsync(__filename).then(function(data){
+      assert.equal(data, false)
+      done();
+    })
+  })
+  it('isDirAsync true', function(done){
+    isDirAsync(__dirname).then(function(data){
+      assert.equal(data, true)
+      done();
+    })
+  })
+})
 
