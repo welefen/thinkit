@@ -530,15 +530,29 @@ let escapeHtml = str => {
  * @param  {Date} date []
  * @return {String}      []
  */
-let datetime = date => {
+let datetime = (date, format) => {
   let fn = d => {
     return ('0' + d).slice(-2);
   };
 
+  if(date && think.isString(date)){
+    date = new Date(Date.parse(date));
+  }
   let d = date || new Date();
-  let dateStr = `${d.getFullYear()}-${fn(d.getMonth() + 1)}-${fn(d.getDate())}`;
-  let timeStr = `${fn(d.getHours())}:${fn(d.getMinutes())}:${fn(d.getSeconds())}`;
-  return dateStr + ' ' + timeStr;
+
+  format = format || 'YYYY-MM-DD HH:mm:ss';
+  let formats = {
+    YYYY: d.getFullYear(),
+    MM:  fn(d.getMonth() + 1),
+    DD: fn(d.getDate()),
+    HH: fn(d.getHours()),
+    mm: fn(d.getMinutes()),
+    ss: fn(d.getSeconds())
+  }
+
+  return format.replace(/([a-z])\1+/ig, a => {
+    return formats[a] || a;
+  });
 };
 
 
