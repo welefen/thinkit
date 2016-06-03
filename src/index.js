@@ -297,6 +297,9 @@ let isDirAsync = p => {
  * @return {Boolean}     []
  */
 let isNumberString = obj => {
+  if(!obj){
+    return false;
+  }
   return numberReg.test(obj);
 };
 /**
