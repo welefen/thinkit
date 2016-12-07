@@ -690,6 +690,9 @@ describe('isEmpty', function(){
   it('isEmpty(0) = true', function(){
     assert.equal(isEmpty(0), true);
   })
+  it('isEmpty({"": ""}) = true', function(){
+    assert.equal(isEmpty({'': ''}), false);
+  })
   it('isEmpty(NaN) = true', function(){
     assert.equal(isEmpty(NaN), true);
   })
